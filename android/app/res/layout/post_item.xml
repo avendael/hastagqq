@@ -1,0 +1,119 @@
+<LinearLayout
+        xmlns:android="http://schemas.android.com/apk/res/android"
+        xmlns:tools="http://schemas.android.com/tools"
+            android:orientation="vertical"
+            android:layout_width="match_parent"
+            android:layout_height="wrap_content"
+            >
+
+        <TextView
+                android:layout_width="match_parent"
+                android:layout_height="wrap_content"
+                android:text="What's in the area?"
+                android:gravity="left"
+                android:textSize="@dimen/text_large"
+                android:textColor="@color/red"
+                />
+
+
+        <EditText
+                android:layout_marginTop="@dimen/margin_normal"
+                android:layout_width="match_parent"
+                android:layout_height="wrap_content"
+                android:textColor="@color/dark_gray"
+                android:gravity="top"
+                android:textSize="@dimen/text_medium"
+                android:background="@null"
+                />
+
+        <View
+                android:layout_width="fill_parent"
+                android:layout_height="1dp"
+                android:background="@color/gray"
+                android:layout_marginTop="@dimen/margin_normal"
+                android:layout_marginBottom="@dimen/margin_small"/>
+
+        <LinearLayout
+                android:layout_marginTop="@dimen/margin_normal"
+                android:orientation="vertical"
+                android:layout_width="match_parent"
+                android:layout_height="wrap_content"
+                >
+
+
+            <RelativeLayout
+                    android:layout_height="wrap_content"
+                    android:layout_width="match_parent">
+
+                <LinearLayout
+                        android:id="@+id/cat_loc_container"
+                        android:layout_height="wrap_content"
+                        android:layout_width="wrap_content"
+                        android:layout_alignParentLeft="true"
+                        android:gravity="left">
+
+                    <RelativeLayout
+                            android:id="@+id/add_pic"
+                            android:layout_height="wrap_content"
+                            android:layout_width="150dp"
+                            >
+
+                        <ImageView
+                                android:id="@+id/btn_addpic"
+                                android:layout_width="wrap_content"
+                                android:layout_height="wrap_content"
+                                android:src="@drawable/btn_addpic"
+                                android:layout_alignParentLeft="true"
+                                />
+
+                        <TextView
+                                android:layout_width="match_parent"
+                                android:layout_height="wrap_content"
+                                android:text="ADD IMAGE"
+                                android:layout_toRightOf="@id/btn_addpic"
+                                android:gravity="left"
+                                android:textSize="@dimen/text_small"
+                                android:textStyle="bold"
+                                android:textColor="@color/gray"
+                                android:layout_centerVertical="true"
+                                android:layout_marginLeft="@dimen/margin_small"/>
+                    </RelativeLayout>
+                </LinearLayout>
+
+                <LinearLayout
+                        android:id="@+id/loc_container"
+                        android:layout_toRightOf="@id/loc_container"
+                        android:gravity="right"
+                        android:layout_height="wrap_content"
+                        android:layout_width="match_parent">
+
+                    <RelativeLayout
+                            android:layout_height="wrap_content"
+                            android:layout_width="wrap_content"
+                            >
+
+                        <ImageView
+                                android:id="@+id/btn_promote"
+                                android:layout_width="wrap_content"
+                                android:layout_height="wrap_content"
+                                android:src="@drawable/ic_location"
+                                android:layout_alignParentLeft="true"
+                                />
+
+                        <TextView
+                                android:id="@+id/btn_like"
+                                android:layout_width="wrap_content"
+                                android:layout_height="wrap_content"
+                                android:src="@drawable/btn_like_on"
+                                android:layout_toRightOf="@id/btn_promote"
+                                android:text="Makati City"
+                                android:gravity="left"
+                                android:textSize="@dimen/text_normal"
+                                android:textColor="@color/gray"
+                                android:layout_centerVertical="true"
+                                />
+                    </RelativeLayout>
+                </LinearLayout>
+            </RelativeLayout>
+        </LinearLayout>
+ </LinearLayout>

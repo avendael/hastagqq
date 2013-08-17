@@ -1,0 +1,152 @@
+<RelativeLayout
+        xmlns:android="http://schemas.android.com/apk/res/android"
+        xmlns:tools="http://schemas.android.com/tools"
+        android:layout_height="wrap_content"
+        android:layout_width="match_parent"
+        android:background="@drawable/post_bg"
+        android:padding="@dimen/padding_small"
+        >
+
+    <ImageView
+            android:id="@+id/avatar"
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:src="@drawable/avatar_chris"
+            android:layout_alignParentLeft="true"
+            android:layout_marginRight="@dimen/padding_xsmall"/>
+
+    <LinearLayout
+            android:id="@+id/post"
+            android:orientation="vertical"
+            android:gravity="left"
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:layout_toRightOf="@id/avatar"
+            >
+
+        <RelativeLayout
+                android:layout_height="wrap_content"
+                android:layout_width="match_parent"
+                >
+
+            <TextView
+                    android:id="@+id/username"
+                    android:layout_width="wrap_content"
+                    android:layout_height="wrap_content"
+                    android:text="Christopher Palce"
+                    android:textAllCaps="true"
+                    android:textSize="@dimen/text_small"
+                    android:textStyle="bold"
+                    android:textColor="@color/red"
+                    android:gravity="left"
+                    android:layout_alignParentLeft="true"/>
+
+            <TextView
+                    android:layout_width="match_parent"
+                    android:layout_height="wrap_content"
+                    android:text="12 m"
+                    android:layout_toRightOf="@id/username"
+                    android:gravity="right"
+                    android:textSize="@dimen/text_small"
+                    android:textStyle="bold"
+                    android:textColor="@color/gray"/>
+
+        </RelativeLayout>
+
+        <TextView
+                android:layout_width="wrap_content"
+                android:layout_height="wrap_content"
+                android:layout_marginTop="@dimen/margin_xsmall"
+                android:text="The van outside my house is playing the A-Team theme tune so loud I'm actually wondering whether it is the actual A-Team."
+                android:textSize="@dimen/text_normal"
+                android:textColor="@color/dark_gray"/>
+    </LinearLayout>
+
+    <LinearLayout
+            android:layout_below="@id/post"
+            android:orientation="vertical"
+            android:layout_width="match_parent"
+            android:layout_height="wrap_content"
+            >
+
+        <View
+                android:layout_width="fill_parent"
+                android:layout_height="1dp"
+                android:background="@color/gray"
+                android:layout_marginTop="@dimen/margin_normal"
+                android:layout_marginBottom="@dimen/margin_small"/>
+
+        <RelativeLayout
+                android:layout_height="wrap_content"
+                android:layout_width="match_parent">
+
+            <LinearLayout
+                    android:id="@+id/cat_loc_container"
+                    android:layout_height="wrap_content"
+                    android:layout_width="wrap_content"
+                    android:layout_alignParentLeft="true"
+                    android:gravity="left">
+
+                <RelativeLayout
+                        android:id="@+id/cat_loc"
+                        android:layout_height="wrap_content"
+                        android:layout_width="100dp"
+                        >
+
+                    <ImageView
+                            android:id="@+id/ic_category"
+                            android:layout_width="wrap_content"
+                            android:layout_height="wrap_content"
+                            android:src="@drawable/ic_traffic"
+                            android:layout_alignParentLeft="true"
+                            />
+
+                    <TextView
+                            android:layout_width="match_parent"
+                            android:layout_height="wrap_content"
+                            android:text="2.2 mi"
+                            android:layout_toRightOf="@id/ic_category"
+                            android:gravity="left"
+                            android:textSize="@dimen/text_small"
+                            android:textStyle="bold"
+                            android:textColor="@color/gray"
+                            android:layout_centerVertical="true"
+                            android:layout_marginLeft="@dimen/margin_small"/>
+                </RelativeLayout>
+            </LinearLayout>
+
+            <LinearLayout
+                    android:id="@+id/actions_container"
+                    android:layout_toRightOf="@id/cat_loc_container"
+                    android:gravity="right"
+                    android:layout_height="wrap_content"
+                    android:layout_width="match_parent">
+
+                <RelativeLayout
+                        android:layout_height="wrap_content"
+                        android:layout_width="wrap_content"
+                        >
+
+                    <ImageView
+                            android:id="@+id/btn_promote"
+                            android:layout_width="wrap_content"
+                            android:layout_height="wrap_content"
+                            android:src="@drawable/btn_promote_on"
+                            android:layout_alignParentLeft="true"
+                            android:layout_marginRight="@dimen/margin_medium"
+
+                            />
+
+                    <ImageView
+                            android:id="@+id/btn_like"
+                            android:layout_width="wrap_content"
+                            android:layout_height="wrap_content"
+                            android:src="@drawable/btn_like_on"
+                            android:layout_toRightOf="@id/btn_promote"
+                            />
+                </RelativeLayout>
+            </LinearLayout>
+        </RelativeLayout>
+    </LinearLayout>
+</RelativeLayout>
+
