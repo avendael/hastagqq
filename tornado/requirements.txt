@@ -1,0 +1,5 @@
+SQLAlchemy==0.8.2
+auto2to3==0.3
+python-gcm==0.1.4
+tornado==3.1
+wsgiref==0.1.2
