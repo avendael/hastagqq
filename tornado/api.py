@@ -1,40 +1,56 @@
 import datetime
 import json
+import time
 
 from tornado import ioloop
 from tornado import web
 from dal import ScopedSession
 from models import Device, News
+from gcm import GCM
 from sqlalchemy.orm.exc import NoResultFound
 
 SUCCESS = "00000"
 FAIL = "00001"
+gcm = GCM("AIzaSyDPVAnupkRfN4TMNKifHsjaKzPbSFMSz8M")
+
+
+def send_gcm(db, location, message, gcm_id=None):
+    clients = [
+        device.gcm_id
+        for device in db.query(Device).filter(Device.location == location)
+    ] if gcm_id is None and gcm_id == '' else [gcm_id]
+
+    gcm.json_request(registration_ids=clients, data=message)
 
 
 class DeviceRegistrationHandler(web.RequestHandler):
     def post(self):
         db = self.application.db
         data = json.loads(self.request.body.decode("utf8"))
-
+        location = "location" in data and data["location"] is not None\
+                   and data["location"] != ''\
+                   and data["location"] or "The Dark Void"
         try:
             device = db.query(Device).filter(
                 Device.gcm_id == data["gcm_id"]).one()
+            device.location = location
             response = {
-                "message": "You are already registered",
-                "response": FAIL}
-            self.write(json.dumps(response))
+                "message": "Device location updated",
+                "response": SUCCESS}
         except NoResultFound:
-            device = Device(gcm_id=data["gcm_id"])
+            device = Device(gcm_id=data["gcm_id"], location=location)
             response = {
                 "message": "Successfully registered",
-                "response": FAIL
+                "response": SUCCESS
             }
 
-            db.add(device)
-            db.commit()
-            db.close()
+        db.query(News).filter(News.location == location).count() > 0\
+            and send_gcm(db, location, device.gcm_id)
+        db.add(device)
+        db.commit()
+        db.close()
 
-            self.write(json.dumps(response))
+        self.write(json.dumps(response))
 
 
 class NewsHandler(web.RequestHandler):
@@ -52,7 +68,12 @@ class NewsHandler(web.RequestHandler):
             "message": "Successfully created news",
             "response": SUCCESS
         }
+        gcm_message = {
+            'message': "New news item in your location.",
+            'timestamp': time.strftime('%Y-%m-%d %H:%M:%S', time.gmtime())
+        }
 
+        self.send_gcm(news.location, gcm_message)
         db.add(news)
         db.commit()
         db.close()
@@ -72,7 +93,6 @@ class NewsHandler(web.RequestHandler):
 
             if location is None or location == "":
                 self.write(json.dumps(response))
-                print "No location"
             else:
                 news_items = db.query(News).filter(News.location == location)
                 json_news_items = [{
@@ -100,7 +120,6 @@ class NewsHandler(web.RequestHandler):
                         if news is None:
                             news = db.query(News).filter(
                                 getattr(News, arg[0]) == arg[1])
-                            print "arg0 " + arg[0] + "arg1" + arg[1]
                         else:
                             news.filter(getattr(News, arg[0]) == arg[1])
 
@@ -121,7 +140,6 @@ class NewsHandler(web.RequestHandler):
                     "response": FAIL
                 }
             except AttributeError as e:
-                print "Attribute error"
                 response = {
                     "response": FAIL,
                     "message": str(e),
