@@ -1,4 +1,4 @@
-webgeek-devcup2013_hastagqq
+hastagqq
 ===========================
 
-Some hackathon project.
+News development.
