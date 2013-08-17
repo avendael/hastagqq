@@ -72,6 +72,7 @@ class NewsHandler(web.RequestHandler):
 
             if location is None or location == "":
                 self.write(json.dumps(response))
+                print "No location"
             else:
                 news_items = db.query(News).filter(News.location == location)
                 json_news_items = [{
@@ -89,35 +90,43 @@ class NewsHandler(web.RequestHandler):
         else:
             try:
                 params = query_params.split("&")
-
                 news = None
+
                 for param in params:
                     arg = param.split("=")
-                    if len(params) < 2 or len(params) > 2:
+                    if len(arg) < 2 or len(arg) > 2:
                         self.write(json.dumps(response))
                     else:
                         if news is None:
                             news = db.query(News).filter(
                                 getattr(News, arg[0]) == arg[1])
+                            print "arg0 " + arg[0] + "arg1" + arg[1]
                         else:
-                            news.filter(getattr(News, arg[0] == arg[1]))
-                        response = {
-                            "response": SUCCESS,
-                            "message": "Retrieved specific news item",
-                            "news": {
-                                "title": news.title,
-                                "content": news.content,
-                                "location": news.location,
-                                "category": news.category,
-                                "score": news.score
-                            }
-                        }
+                            news.filter(getattr(News, arg[0]) == arg[1])
+
+                response = {
+                    "response": SUCCESS,
+                    "message": "Retrieved news items",
+                    "news_items": [{
+                        "title": item.title,
+                        "content": item.content,
+                        "location": item.location,
+                        "category": item.category,
+                        "score": item.score
+                    } for item in news]
+                }
             except NoResultFound:
                 response = {
                     "message": "No such item",
                     "response": FAIL
                 }
-            except AttributeError:
+            except AttributeError as e:
+                print "Attribute error"
+                response = {
+                    "response": FAIL,
+                    "message": str(e),
+                    "params": str(params)
+                }
                 self.write(json.dumps(response))
 
         self.write(json.dumps(response))

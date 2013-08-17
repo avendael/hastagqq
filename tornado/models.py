@@ -36,4 +36,4 @@ class News(Base):
     score = Column(Integer)
 
     def __repr__(self):
-        return "<News: %s -- %s>" % (self.title, self.category.name)
+        return "<News: %s -- %s>" % (self.title, self.category)
