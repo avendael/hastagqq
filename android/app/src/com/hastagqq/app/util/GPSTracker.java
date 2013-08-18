@@ -1,9 +1,5 @@
 package com.hastagqq.app.util;
 
-import java.io.IOException;
-import java.util.List;
-import java.util.Locale;
-
 import android.app.AlertDialog;
 import android.app.Service;
 import android.content.Context;
@@ -18,6 +14,10 @@ import android.os.Bundle;
 import android.os.IBinder;
 import android.provider.Settings;
 import android.util.Log;
+
+import java.io.IOException;
+import java.util.List;
+import java.util.Locale;
 
 public class GPSTracker extends Service implements LocationListener{
 	private static final String TAG = GPSTracker.class.getSimpleName();
@@ -208,7 +208,7 @@ public class GPSTracker extends Service implements LocationListener{
     public String getCity() {
     	Geocoder gcd = new Geocoder(mContext, Locale.getDefault());
     	List<Address> addresses;
-    	String cityName = null;
+    	String cityName = "The Dark Void";
     	
 		try {
 			addresses = gcd.getFromLocation(getLatitude(), getLongitude(), 1);
@@ -218,7 +218,7 @@ public class GPSTracker extends Service implements LocationListener{
 		} catch (IOException e) {
 			Log.d(TAG, "::getCity() -- ERROR: " + e.getMessage());
 		}
-		
+
     	return cityName;
     }
 

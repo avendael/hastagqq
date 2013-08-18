@@ -33,10 +33,12 @@ public class NewsListFragment extends ListFragment {
             View view = inflater.inflate(R.layout.news_item, parent, false);
             TextView tvTitle = (TextView) view.findViewById(R.id.tv_title);
             TextView tvContent = (TextView) view.findViewById(R.id.tv_content);
+            TextView tvLocation = (TextView) view.findViewById(R.id.tv_location);
 
             News news = mNewsItems.get(position);
             tvTitle.setText(news.getTitle());
             tvContent.setText(news.getContent());
+            tvLocation.setText(news.getLocation());
 
             return view;
         }
