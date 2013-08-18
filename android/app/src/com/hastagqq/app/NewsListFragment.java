@@ -36,7 +36,7 @@ public class NewsListFragment extends ListFragment {
 
             News news = mNewsItems.get(position);
             tvTitle.setText(news.getTitle());
-            tvContent.setText(news.getCategory());
+            tvContent.setText(news.getContent());
 
             return view;
         }
@@ -72,7 +72,9 @@ public class NewsListFragment extends ListFragment {
             mNewsItems = newsItems;
             mAdapter = new NewsArrayAdapter(getActivity(), R.id.txt_location, newsItems);
 
-            if (isVisible()) setListAdapter(mAdapter);
+            if (getListView() != null && getListView().getVisibility() == View.VISIBLE) {
+                setListAdapter(mAdapter);
+            }
         }
     }
 }

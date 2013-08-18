@@ -54,6 +54,7 @@ public class MainActivity extends FragmentActivity implements NewsApiClient.GetC
     private NewsListFragment mNewsListFragment;
     private NewsDal mNewsDal;
     private List<News> mNewsItems;
+    private String mCurrentFragment;
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
@@ -210,8 +211,10 @@ public class MainActivity extends FragmentActivity implements NewsApiClient.GetC
     @Override
     public void onBackPressed() {
         super.onBackPressed();
-        if (mNewsListFragment != null && mNewsListFragment.isVisible()) {
-            mNewsListFragment.onNewsAvailable(mNewsItems);
+        if (mCurrentFragment != null && mCurrentFragment.equals("create")
+                && mNewsListFragment != null && mNewsListFragment.isVisible()) {
+            NewsApiClient.getNews(mLocation, this);
+            showNewsListFragment();
         }
     }
 
@@ -273,6 +276,7 @@ public class MainActivity extends FragmentActivity implements NewsApiClient.GetC
     }
 
     private void showNewsListFragment() {
+        mCurrentFragment = "list";
         FragmentTransaction ft = getSupportFragmentManager().beginTransaction();
         mNewsListFragment = new NewsListFragment();
         ft.replace(R.id.fl_fragment_container, mNewsListFragment, NewsListFragment.TAG_FRAGMENT);
@@ -280,6 +284,7 @@ public class MainActivity extends FragmentActivity implements NewsApiClient.GetC
     }
 
     private void showCreateNewsFragment() {
+        mCurrentFragment = "create";
         CreateNewsFragment createNewsFragment = new CreateNewsFragment();
         Bundle args = new Bundle();
 
