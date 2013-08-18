@@ -3,6 +3,7 @@ package com.hastagqq.app;
 import android.app.Activity;
 import android.os.Bundle;
 import android.support.v4.app.Fragment;
+import android.util.Log;
 import android.view.LayoutInflater;
 import android.view.Menu;
 import android.view.MenuInflater;
@@ -21,6 +22,8 @@ import org.apache.commons.lang3.StringUtils;
  */
 public class CreateNewsFragment extends Fragment {
     public static final String EXTRAS_LOCATION = "CreateNewsFragment.extras_location";
+    private static final String TAG = CreateNewsFragment.class.getSimpleName();
+
     private EditText mEtTitle;
     private EditText mEtContent;
     private String mLocation;
@@ -44,7 +47,7 @@ public class CreateNewsFragment extends Fragment {
         mEtContent = (EditText) view.findViewById(R.id.et_news_content);
         String defaultLocation = getString(R.string.default_news_location);
         mLocation = args != null
-                ? StringUtils.isNotEmpty(args.getString(EXTRAS_LOCATION, defaultLocation))
+                ? !StringUtils.isNotEmpty(args.getString(EXTRAS_LOCATION, defaultLocation))
                 ? args.getString(EXTRAS_LOCATION, defaultLocation)
                 : defaultLocation : defaultLocation;
         mCallback = (NewsApiClient.CreateCallback) getActivity();
@@ -63,8 +66,9 @@ public class CreateNewsFragment extends Fragment {
     @Override
     public boolean onOptionsItemSelected(MenuItem item) {
         switch (item.getItemId()) {
-            case R.id.menu_create_news:
+            case R.id.menu_submit_news:
                 submitNews();
+
                 return true;
             default:
                 return super.onOptionsItemSelected(item);
@@ -72,17 +76,19 @@ public class CreateNewsFragment extends Fragment {
     }
 
     private void submitNews() {
+        Log.d(TAG, "::submitNews() -- START");
         String defaultTitle = getString(R.string.default_news_title);
         String title = mEtTitle.getText() != null
-                ? StringUtils.isNotEmpty(mEtTitle.getText().toString())
+                ? !StringUtils.isNotEmpty(mEtTitle.getText().toString())
                 ? mEtTitle.getText().toString()
                 : defaultTitle : defaultTitle;
         String defaultContent = getString(R.string.default_news_content);
         String content = mEtContent.getText() != null
-                ? StringUtils.isNotEmpty(mEtContent.getText().toString())
+                ? !StringUtils.isNotEmpty(mEtContent.getText().toString())
                 ? mEtContent.getText().toString()
                 : defaultContent : defaultContent;
         News news = new News(title, content, mLocation, "");
         NewsApiClient.createNews(news, mCallback);
+        Log.d(TAG, "::submitNews() -- END");
     }
 }

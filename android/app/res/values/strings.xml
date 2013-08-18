@@ -7,6 +7,7 @@
     <string name="err_no_gcm">Unsupported device.</string>
     <string name="msg_new_news">You have news about your location</string>
     <string name="msg_view_news">Run the app to view what this place is about!</string>
+    <string name="menu_submit_news">Submit News</string>
     <string name="menu_create_news">Create News</string>
     <string name="hint_news_content">Content...</string>
     <string name="hint_news_title">What\'s happening?</string>

@@ -5,5 +5,8 @@
         android:orderInCategory="100"
         android:showAsAction="never"
         android:title="@string/action_settings"/>
-
+    <item android:id="@+id/menu_create_news"
+          android:title="@string/menu_create_news"
+          android:icon="@drawable/btn_add"
+          android:showAsAction="always" />
 </menu>
