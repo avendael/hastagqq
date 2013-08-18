@@ -36,6 +36,7 @@ import org.apache.http.impl.client.DefaultHttpClient;
 
 import java.io.IOException;
 import java.sql.SQLException;
+import java.util.Collections;
 import java.util.List;
 
 public class MainActivity extends FragmentActivity implements NewsApiClient.GetCallback,
@@ -133,7 +134,11 @@ public class MainActivity extends FragmentActivity implements NewsApiClient.GetC
         Log.d(TAG, "::onGetNewsComplete() -- newsItems size = " + newsItems.size());
 
         mNewsItems = newsItems;
-        mNewsListFragment.onNewsAvailable(newsItems);
+
+        Collections.reverse(newsItems);
+
+        if (mCurrentFragment != null && mCurrentFragment.equals("list"))
+            mNewsListFragment.onNewsAvailable(newsItems);
 
         new Thread(new Runnable() {
             @Override
