@@ -3,6 +3,6 @@
 <menu xmlns:android="http://schemas.android.com/apk/res/android">
     <item android:id="@+id/menu_submit_news"
           android:title="@string/menu_submit_news"
-          android:icon="@drawable/btn_add"
+          android:icon="@drawable/btn_post"
           android:showAsAction="always" />
 </menu>

@@ -1,50 +1,74 @@
 package com.hastagqq.app;
 
-import android.database.Cursor;
+import android.app.Activity;
+import android.content.Context;
 import android.os.Bundle;
-import android.support.v4.app.Fragment;
-import android.support.v4.widget.SimpleCursorAdapter;
+import android.support.v4.app.ListFragment;
 import android.view.LayoutInflater;
 import android.view.View;
 import android.view.ViewGroup;
-import android.widget.ListView;
+import android.widget.ArrayAdapter;
+import android.widget.TextView;
 
-import com.hastagqq.app.util.DBAdapter;
+import com.hastagqq.app.model.News;
+
+import java.util.ArrayList;
+import java.util.List;
 
 
-public class NewsListFragment extends Fragment{
+public class NewsListFragment extends ListFragment {
     public static final String TAG_FRAGMENT = "tag_news_list_fragment";
     
-    private SimpleCursorAdapter mDataAdapter;    
-    
+    private ArrayAdapter<News> mAdapter;
+    private List<News> mNewsItems;
+
+    private class NewsArrayAdapter extends ArrayAdapter<News> {
+        public NewsArrayAdapter(Context context, int resource, List<News> objects) {
+            super(context, resource, objects);
+        }
+
+        @Override
+        public View getView(int position, View convertView, ViewGroup parent) {
+            LayoutInflater inflater = ((Activity) getActivity()).getLayoutInflater();
+            View view = inflater.inflate(R.layout.news_item, parent, false);
+            TextView tvTitle = (TextView) view.findViewById(R.id.tv_title);
+            TextView tvContent = (TextView) view.findViewById(R.id.tv_content);
+
+            News news = mNewsItems.get(position);
+            tvTitle.setText(news.getTitle());
+            tvContent.setText(news.getCategory());
+
+            return view;
+        }
+    }
+
     @Override
     public View onCreateView(LayoutInflater inflater, ViewGroup container, Bundle savedInstanceState) {
         View view = inflater.inflate(R.layout.news_list_fragment, container, false);
 
-        DBAdapter db = new DBAdapter(getActivity());
-        db.open();
-        Cursor cursor = db.getAllNews();
-        
-        String[] columns = new String[] {
-                DBAdapter.KEY_CONTENT,
-        };
-        
-        int[] to = new int[] {
-                R.id.id_content
-        };
-        
-        mDataAdapter = new SimpleCursorAdapter(
-                getActivity(),
-                R.layout.news_item,
-                cursor,
-                columns,
-                to,
-                0);
-        
-        ListView listView = (ListView) view.findViewById(R.id.list_news);
-        listView.setAdapter(mDataAdapter);
-        
-        
-        return view;        
+        return view;
+    }
+
+    @Override
+    public void onActivityCreated(Bundle savedInstanceState) {
+        super.onActivityCreated(savedInstanceState);
+        mNewsItems = new ArrayList<News>();
+        mAdapter = new NewsArrayAdapter(getActivity(), R.id.txt_location, mNewsItems);
+
+        setListAdapter(mAdapter);
+    }
+
+//    @Override
+//    public void onViewCreated(View view, Bundle savedInstanceState) {
+//        super.onViewCreated(view, savedInstanceState);
+//
+//        getListView().setAdapter(mAdapter);
+//    }
+
+    public void onNewsAvailable(List<News> newsItems) {
+        mNewsItems = newsItems;
+        mAdapter = new NewsArrayAdapter(getActivity(), R.id.txt_location, newsItems);
+
+        setListAdapter(mAdapter);
     }
 }

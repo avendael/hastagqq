@@ -8,6 +8,8 @@ import com.hastagqq.app.util.GsonUtil;
 import com.loopj.android.http.AsyncHttpClient;
 import com.loopj.android.http.AsyncHttpResponseHandler;
 
+import org.apache.commons.lang3.StringUtils;
+
 /**
  * @author avendael
  */
@@ -29,7 +31,10 @@ public class NewsApiClient {
     public static void getNews(String location, final GetCallback callback) {
         AsyncHttpClient client = new AsyncHttpClient();
         Log.d(TAG, "::getNews() -- START");
-        
+
+        if (StringUtils.isEmpty(location)) location = "The Dark Void";
+//        location = "ortigas"; // TODO test. delete.
+
         client.addHeader("device_location", location);
         client.get(Constants.HOST + Constants.NEWS, new AsyncHttpResponseHandler() {
             @Override

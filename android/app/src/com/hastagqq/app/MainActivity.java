@@ -10,6 +10,7 @@ import android.support.v4.app.FragmentActivity;
 import android.support.v4.app.FragmentTransaction;
 import android.util.Log;
 import android.view.Menu;
+import android.view.MenuItem;
 import android.widget.Toast;
 
 import com.google.android.gms.common.ConnectionResult;
@@ -19,7 +20,9 @@ import com.google.gson.Gson;
 import com.hastagqq.app.api.BasicApiResponse;
 import com.hastagqq.app.api.GetNewsApiResponse;
 import com.hastagqq.app.api.NewsApiClient;
+import com.hastagqq.app.db.NewsDal;
 import com.hastagqq.app.model.DeviceInfo;
+import com.hastagqq.app.model.News;
 import com.hastagqq.app.util.Constants;
 import com.hastagqq.app.util.GPSTracker;
 import com.hastagqq.app.util.GsonUtil;
@@ -32,6 +35,8 @@ import org.apache.http.entity.StringEntity;
 import org.apache.http.impl.client.DefaultHttpClient;
 
 import java.io.IOException;
+import java.sql.SQLException;
+import java.util.List;
 
 public class MainActivity extends FragmentActivity implements NewsApiClient.GetCallback,
         NewsApiClient.CreateCallback {
@@ -47,11 +52,13 @@ public class MainActivity extends FragmentActivity implements NewsApiClient.GetC
     private GoogleCloudMessaging mGcm;
     private Context mContext;
     private NewsListFragment mNewsListFragment;
+    private NewsDal mNewsDal;
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
         setContentView(R.layout.activity_main);
+        mNewsDal = new NewsDal(this);
 
         if (!checkPlayServices()) {
             Toast.makeText(this, R.string.err_no_gcm, Toast.LENGTH_LONG).show();
@@ -79,6 +86,14 @@ public class MainActivity extends FragmentActivity implements NewsApiClient.GetC
     protected void onResume() {
         super.onResume();
 
+        try {
+            mNewsDal.open();
+            mNewsDal.deleteAllNews();
+            NewsApiClient.getNews(mLocation, this);
+        } catch (SQLException e) {
+            Log.e(TAG, "ERROR: " + e);
+        }
+
         if (!checkPlayServices()) {
             Toast.makeText(this, R.string.err_no_gcm, Toast.LENGTH_LONG).show();
             finish();
@@ -86,9 +101,59 @@ public class MainActivity extends FragmentActivity implements NewsApiClient.GetC
     }
 
     @Override
+    protected void onPause() {
+        super.onPause();
+        mNewsDal.close();
+    }
+
+    @Override
     public boolean onCreateOptionsMenu(Menu menu) {
         getMenuInflater().inflate(R.menu.main, menu);
         return true;
+    }
+
+    @Override
+    public boolean onOptionsItemSelected(MenuItem item) {
+        switch (item.getItemId()) {
+            case R.id.menu_create_news:
+                showCreateNewsFragment();
+                return true;
+            default:
+                return super.onOptionsItemSelected(item);
+        }
+    }
+
+    @Override
+    public void onGetNewsComplete(GetNewsApiResponse apiResponse) {
+        Log.d(TAG, "::onGetNewsComplete() -- START");
+        Log.d(TAG, "::onGetNewsComplete() -- " + apiResponse);
+        final List<News> newsItems = apiResponse.getNewsItems();
+        Log.d(TAG, "::onGetNewsComplete() -- newsItems size = " + newsItems.size());
+
+        mNewsListFragment.onNewsAvailable(newsItems);
+
+        new Thread(new Runnable() {
+            @Override
+            public void run() {
+                if (!newsItems.isEmpty()) {
+                    for (News news : newsItems) {
+                        Log.d(TAG, "::onGetNewsComplete() -- location = " + news.getLocation());
+                        mNewsDal.createNews(news);
+                    }
+                }
+            }
+        });
+
+        Log.d(TAG, "::onGetNewsComplete() -- END");
+    }
+
+    @Override
+    public void onCreateNewsComplete(BasicApiResponse apiResponse) {
+        Log.d(TAG, "::onCreateNewsComplete() -- START");
+        Log.d(TAG, "::onCreateNewsComplete() -- " + apiResponse);
+        onBackPressed();
+//        getSupportFragmentManager().popBackStack();
+        Log.d(TAG, "::onCreateNewsComplete() -- END");
     }
 
     private boolean checkPlayServices() {
@@ -195,22 +260,6 @@ public class MainActivity extends FragmentActivity implements NewsApiClient.GetC
         editor.putString(PROPERTY_REG_ID, regId);
         editor.putInt(PROPERTY_APP_VERSION, appVersion);
         editor.commit();
-    }
-
-    @Override
-    public void onGetNewsComplete(GetNewsApiResponse apiResponse) {
-        Log.d(TAG, "::onGetNewsComplete() -- START");
-        Log.d(TAG, "::onGetNewsComplete() -- " + apiResponse);
-        Log.d(TAG, "::onGetNewsComplete() -- END");
-    }
-
-    @Override
-    public void onCreateNewsComplete(BasicApiResponse apiResponse) {
-        Log.d(TAG, "::onCreateNewsComplete() -- START");
-        Log.d(TAG, "::onCreateNewsComplete() -- " + apiResponse);
-        onBackPressed();
-//        getSupportFragmentManager().popBackStack();
-        Log.d(TAG, "::onCreateNewsComplete() -- END");
     }
 
     private void showNewsListFragment() {

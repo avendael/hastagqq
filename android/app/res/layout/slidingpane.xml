@@ -258,7 +258,6 @@
 
         <RelativeLayout
                 xmlns:android="http://schemas.android.com/apk/res/android"
-                xmlns:tools="http://schemas.android.com/tools"
                 android:layout_height="wrap_content"
                 android:layout_width="match_parent"
                 android:background="@drawable/post_bg"
@@ -288,7 +287,7 @@
                         >
 
                     <TextView
-                            android:id="@+id/username"
+                            android:id="@+id/title"
                             android:layout_width="wrap_content"
                             android:layout_height="wrap_content"
                             android:text="Christopher Palce"
@@ -303,7 +302,7 @@
                             android:layout_width="match_parent"
                             android:layout_height="wrap_content"
                             android:text="12 m"
-                            android:layout_toRightOf="@id/username"
+                            android:layout_toRightOf="@id/title"
                             android:gravity="right"
                             android:textSize="@dimen/text_small"
                             android:textStyle="bold"

@@ -1,7 +1,6 @@
 <?xml version="1.0" encoding="utf-8"?>
 <RelativeLayout
         xmlns:android="http://schemas.android.com/apk/res/android"
-        xmlns:tools="http://schemas.android.com/tools"
         android:layout_height="wrap_content"
         android:layout_width="match_parent"
         android:background="@drawable/post_bg"
@@ -31,10 +30,9 @@
                 >
 
             <TextView
-                    android:id="@+id/username"
+                    android:id="@+id/tv_title"
                     android:layout_width="wrap_content"
                     android:layout_height="wrap_content"
-                    android:text="Christopher Palce"
                     android:textAllCaps="true"
                     android:textSize="@dimen/text_small"
                     android:textStyle="bold"
@@ -46,7 +44,7 @@
                     android:layout_width="match_parent"
                     android:layout_height="wrap_content"
                     android:text="12 m"
-                    android:layout_toRightOf="@id/username"
+                    android:layout_toRightOf="@id/tv_title"
                     android:gravity="right"
                     android:textSize="@dimen/text_small"
                     android:textStyle="bold"
@@ -55,11 +53,10 @@
         </RelativeLayout>
 
         <TextView
-            	android:id="@+id/id_content"
+            	android:id="@+id/tv_content"
                 android:layout_width="wrap_content"
                 android:layout_height="wrap_content"
                 android:layout_marginTop="@dimen/margin_xsmall"
-                android:text="The van outside my house is playing the A-Team theme tune so loud I'm actually wondering whether it is the actual A-Team."
                 android:textSize="@dimen/text_normal"
                 android:textColor="@color/dark_gray"/>
     </LinearLayout>

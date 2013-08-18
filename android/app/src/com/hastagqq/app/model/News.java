@@ -46,7 +46,6 @@ public class News implements BaseColumns {
         this.category = cursor.getString(cursor.getColumnIndex(CATEGORY));
         this.location = cursor.getString(cursor.getColumnIndex(LOCATION));
         this.score = cursor.getLong(cursor.getColumnIndex(SCORE));
-        this.timestamp = cursor.getLong(cursor.getColumnIndex(TIMESTAMP));
     }
 
     @Expose

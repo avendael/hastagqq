@@ -11,6 +11,7 @@ import android.view.MenuItem;
 import android.view.View;
 import android.view.ViewGroup;
 import android.widget.EditText;
+import android.widget.TextView;
 
 import com.hastagqq.app.api.NewsApiClient;
 import com.hastagqq.app.model.News;
@@ -45,6 +46,7 @@ public class CreateNewsFragment extends Fragment {
         Bundle args = getArguments();
         mEtTitle = (EditText) view.findViewById(R.id.et_news_title);
         mEtContent = (EditText) view.findViewById(R.id.et_news_content);
+        TextView txtLocation = (TextView) view.findViewById(R.id.txt_location);
         String defaultLocation = getString(R.string.default_news_location);
         mLocation = args != null
                 ? !StringUtils.isNotEmpty(args.getString(EXTRAS_LOCATION, defaultLocation))
@@ -52,6 +54,8 @@ public class CreateNewsFragment extends Fragment {
                 : defaultLocation : defaultLocation;
         mCallback = (NewsApiClient.CreateCallback) getActivity();
 
+        Log.d(TAG, "::onCreateView() mLocation " + mLocation);
+        txtLocation.setText(mLocation);
         setHasOptionsMenu(true);
         return view;
     }

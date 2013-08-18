@@ -16,8 +16,8 @@ import java.util.List;
  */
 public class NewsDal {
     public static final String[] NEWS_PROJECTION = {
-            News._ID, News.TITLE, News.TITLE, News.CONTENT, News.CATEGORY, News.LOCATION,
-            News.SCORE, News.TIMESTAMP
+            News._ID, News.TITLE, News.CONTENT, News.CATEGORY, News.LOCATION,
+            News.SCORE
     };
 
     private SQLiteDatabase mDatabase;
@@ -43,7 +43,7 @@ public class NewsDal {
         values.put(News.CATEGORY, news.getCategory());
         values.put(News.LOCATION, news.getLocation());
         values.put(News.SCORE, news.getScore());
-        values.put(News.TIMESTAMP, news.getTimestamp());
+//        values.put(News.TIMESTAMP, news.getTimestamp());
 
         return mDatabase.insert(News.TABLE_NAME, null, values);
     }
