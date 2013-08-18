@@ -1,26 +1,6 @@
 package com.hastagqq.app;
 
-import java.io.IOException;
-
-import org.apache.http.HttpResponse;
-import org.apache.http.client.HttpClient;
-import org.apache.http.client.methods.HttpPost;
-import org.apache.http.entity.StringEntity;
-import org.apache.http.impl.client.DefaultHttpClient;
-import org.json.JSONObject;
-
-import com.google.android.gms.common.ConnectionResult;
-import com.google.android.gms.common.GooglePlayServicesUtil;
-import com.google.android.gms.gcm.GoogleCloudMessaging;
-import com.hastagqq.app.api.BasicApiResponse;
-import com.hastagqq.app.api.GetNewsApiResponse;
-import com.hastagqq.app.api.NewsApiClient;
-import com.hastagqq.app.model.News;
-import com.hastagqq.app.util.Constants;
-import com.hastagqq.app.util.GPSTracker;
-
-import com.loopj.android.http.*;
-
+import android.app.Activity;
 import android.content.Context;
 import android.content.SharedPreferences;
 import android.content.pm.PackageInfo;
@@ -28,23 +8,45 @@ import android.content.pm.PackageManager;
 import android.location.Location;
 import android.os.AsyncTask;
 import android.os.Bundle;
-import android.app.Activity;
 import android.util.Log;
 import android.view.Menu;
 import android.widget.Toast;
+
+import com.google.android.gms.common.ConnectionResult;
+import com.google.android.gms.common.GooglePlayServicesUtil;
+import com.google.android.gms.gcm.GoogleCloudMessaging;
+import com.google.gson.Gson;
+import com.hastagqq.app.api.BasicApiResponse;
+import com.hastagqq.app.api.GetNewsApiResponse;
+import com.hastagqq.app.api.NewsApiClient;
+import com.hastagqq.app.model.DeviceInfo;
+import com.hastagqq.app.model.News;
+import com.hastagqq.app.util.Constants;
+import com.hastagqq.app.util.GPSTracker;
+import com.hastagqq.app.util.GsonUtil;
+import com.hastagqq.app.util.HttpUtil;
+
+import org.apache.http.HttpResponse;
+import org.apache.http.client.HttpClient;
+import org.apache.http.client.methods.HttpPost;
+import org.apache.http.entity.StringEntity;
+import org.apache.http.impl.client.DefaultHttpClient;
+
+import java.io.IOException;
 
 public class MainActivity extends Activity implements NewsApiClient.GetCallback,
         NewsApiClient.CreateCallback {
 	private static final String TAG = MainActivity.class.getSimpleName();
     private static final String PROPERTY_APP_VERSION = "appVersion";
-    private static final String SENDER_ID = "649977625032";
     private static final int PLAY_SERVICES_RESOLUTION_REQUEST = 9000;
 
     public static final String EXTRA_MESSAGE = "message";
     public static final String PROPERTY_REG_ID = "registration_id";
 
     private String mRegId;
+    private String mLocation;
     private GoogleCloudMessaging mGcm;
+    private Context mContext;
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
@@ -56,15 +58,25 @@ public class MainActivity extends Activity implements NewsApiClient.GetCallback,
             finish();
 
             return;
+        } else {
+            mGcm = GoogleCloudMessaging.getInstance(this);
+            mContext = getApplicationContext();
+            mRegId = getRegistrationId(mContext);
+
+            if (mRegId.isEmpty()) {
+                registerInBackground();
+            }
         }
 
         GPSTracker gpsTracker = new GPSTracker(MainActivity.this);
+        mLocation = gpsTracker.getCity();
         Location location = gpsTracker.getLocation();
+
         Log.d(TAG, "::onCreate() -- " + location.getLatitude() + " - " + location.getLongitude());
 
-        NewsApiClient.createNews(new News("This is the new thing", "asdf", "ortigas", "traffic"),
+        NewsApiClient.createNews(new News("This is the new thing", "asdf", "Makati City", "traffic"),
                 this);
-        NewsApiClient.getNews("ortigas", this);
+        NewsApiClient.getNews("Makati City", this);
     }
 
     @Override
@@ -102,15 +114,13 @@ public class MainActivity extends Activity implements NewsApiClient.GetCallback,
     }
 
     private String getRegistrationId(Context context) {
-        final SharedPreferences prefs = getGCMPreferences(context);
+        final SharedPreferences prefs = getGCMPreferences();
         String registrationId = prefs.getString(PROPERTY_REG_ID, "");
         if (registrationId.isEmpty()) {
             Log.i(TAG, "Registration not found.");
             return "";
         }
-        // Check if app was updated; if so, it must clear the registration ID
-        // since the existing regID is not guaranteed to work with the new
-        // app version.
+
         int registeredVersion = prefs.getInt(PROPERTY_APP_VERSION, Integer.MIN_VALUE);
         int currentVersion = getAppVersion(context);
         if (registeredVersion != currentVersion) {
@@ -131,7 +141,7 @@ public class MainActivity extends Activity implements NewsApiClient.GetCallback,
         }
     }
 
-    private SharedPreferences getGCMPreferences(Context context) {
+    private SharedPreferences getGCMPreferences() {
         return getSharedPreferences(MainActivity.class.getSimpleName(), Context.MODE_PRIVATE);
     }
 
@@ -139,33 +149,22 @@ public class MainActivity extends Activity implements NewsApiClient.GetCallback,
         new AsyncTask<Void, Void, String>() {
             @Override
             protected String doInBackground(Void... params) {
-                String msg = "";
+                String msg;
+
                 try {
                     if (mGcm == null) {
                         mGcm = GoogleCloudMessaging.getInstance(MainActivity.this);
                     }
 
-                    mRegId = mGcm.register(SENDER_ID);
+                    mRegId = mGcm.register(Constants.SENDER_ID);
                     msg = "Device registered, registration ID=" + mRegId;
 
-                    // You should send the registration ID to your server over HTTP,
-                    // so it can use GCM/HTTP or CCS to send messages to your app.
-                    // The request to your server should be authenticated if your app
-                    // is using accounts.
                     sendRegistrationIdToBackend();
-
-                    // For this demo: we don't need to send it because the device
-                    // will send upstream messages to a server that echo back the
-                    // message using the 'from' address in the message.
-
-                    // Persist the regID - no need to register again.
                     storeRegistrationId(MainActivity.this, mRegId);
                 } catch (IOException ex) {
                     msg = "Error :" + ex.getMessage();
-                    // If there is an error, don't just keep trying to register.
-                    // Require the user to click a button again, or perform
-                    // exponential back-off.
                 }
+
                 return msg;
             }
 
@@ -177,11 +176,24 @@ public class MainActivity extends Activity implements NewsApiClient.GetCallback,
     }
 
     private void sendRegistrationIdToBackend() {
-        // TODO
+        HttpClient httpClient = new DefaultHttpClient();
+        HttpPost httpPost = new HttpPost(Constants.HOST + Constants.DEVICE);
+        Gson defaultGsonParser = GsonUtil.getDefaultGsonParser();
+        DeviceInfo deviceInfo = new DeviceInfo(mRegId, mLocation);
+
+        Log.d(TAG, "::sendRegistrationIdToBackend() -- payload " + defaultGsonParser.toJson(deviceInfo));
+        try {
+            httpPost.setEntity(new StringEntity(defaultGsonParser.toJson(deviceInfo)));
+            HttpResponse response = httpClient.execute(httpPost);
+            BasicApiResponse basicApiResponse = HttpUtil.parseBasicApiResponse(response);
+            Log.d(TAG, "::sendRegistrationIdToBackend() -- " + defaultGsonParser.toJson(basicApiResponse));
+        } catch (IOException e) {
+            Log.e(TAG, "::postData() -- ERROR: " + e.getMessage());
+        }
     }
 
     private void storeRegistrationId(Context context, String regId) {
-        final SharedPreferences prefs = getGCMPreferences(context);
+        final SharedPreferences prefs = getGCMPreferences();
         int appVersion = getAppVersion(context);
 
         SharedPreferences.Editor editor = prefs.edit();
