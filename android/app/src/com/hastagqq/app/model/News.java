@@ -1,11 +1,36 @@
 package com.hastagqq.app.model;
 
+import android.database.Cursor;
+import android.provider.BaseColumns;
+
 import com.google.gson.annotations.Expose;
 
 /**
  * @author avendael
  */
-public class News {
+public class News implements BaseColumns {
+    public static final String TABLE_NAME = "news";
+
+    // Database columns
+    public static final String TITLE = "title";
+    public static final String CONTENT = "content";
+    public static final String LOCATION = "location";
+    public static final String CATEGORY = "category";
+    public static final String SCORE = "score";
+    public static final String TIMESTAMP = "timestamp";
+
+    // DB boilerplate
+    public static final String SQL_CREATE_TABLE = "CREATE TABLE " + TABLE_NAME + " ("
+            + BaseColumns._ID + " INTEGER PRIMARY KEY AUTOINCREMENT,"
+            + TITLE + " TEXT, "
+            + CONTENT + "TEXT, "
+            + LOCATION + "TEXT, "
+            + CATEGORY + "TEXT, "
+            + SCORE + "INTEGER, "
+            + TIMESTAMP + "TEXT"
+            + ");";
+    public static final String SQL_DROP_TABLE = "DROP TABLE IF EXISTS " + TABLE_NAME;
+
     public News() {}
 
     public News(String title, String content, String location, String category) {
@@ -13,6 +38,15 @@ public class News {
         this.content = content;
         this.location = location;
         this.category = category;
+    }
+
+    public News(Cursor cursor) {
+        this.title = cursor.getString(cursor.getColumnIndex(TITLE));
+        this.content = cursor.getString(cursor.getColumnIndex(CONTENT));
+        this.category = cursor.getString(cursor.getColumnIndex(CATEGORY));
+        this.location = cursor.getString(cursor.getColumnIndex(LOCATION));
+        this.score = cursor.getLong(cursor.getColumnIndex(SCORE));
+        this.timestamp = cursor.getLong(cursor.getColumnIndex(TIMESTAMP));
     }
 
     @Expose

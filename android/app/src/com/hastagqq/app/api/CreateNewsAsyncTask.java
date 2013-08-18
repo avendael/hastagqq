@@ -3,9 +3,11 @@ package com.hastagqq.app.api;
 import android.os.AsyncTask;
 import android.util.Log;
 
+import com.google.gson.Gson;
 import com.hastagqq.app.model.News;
 import com.hastagqq.app.util.Constants;
 import com.hastagqq.app.util.GsonUtil;
+import com.hastagqq.app.util.HttpUtil;
 
 import org.apache.http.HttpResponse;
 import org.apache.http.client.HttpClient;
@@ -33,17 +35,20 @@ public class CreateNewsAsyncTask extends AsyncTask<News, Void, BasicApiResponse>
     protected BasicApiResponse doInBackground(News... params) {
         HttpClient httpClient = new DefaultHttpClient();
         HttpPost httpPost = new HttpPost(Constants.HOST + Constants.NEWS);
+        HttpResponse response = null;
+        Gson defaultGsonParser = GsonUtil.getDefaultGsonParser();
 
-        Log.d(TAG, "::postData() -- payload " + GsonUtil.getDefaultGsonParser().toJson(params[0]));
+        Log.d(TAG, "::postData() -- payload " + defaultGsonParser.toJson(params[0]));
         try {
-            httpPost.setEntity(new StringEntity(GsonUtil.getDefaultGsonParser().toJson(params[0])));
-            HttpResponse response = httpClient.execute(httpPost);
+            httpPost.setEntity(new StringEntity(defaultGsonParser.toJson(params[0])));
+            response = httpClient.execute(httpPost);
+
             Log.d(TAG, "::postData() -- response = " + response.toString());
         } catch (IOException e) {
             Log.e(TAG, "::postData() -- ERROR: " + e.getMessage());
         }
 
-        return null;
+        return HttpUtil.parseBasicApiResponse(response);
     }
 
     @Override
