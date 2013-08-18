@@ -1,6 +1,5 @@
 package com.hastagqq.app;
 
-import android.app.Activity;
 import android.content.Context;
 import android.content.SharedPreferences;
 import android.content.pm.PackageInfo;
@@ -8,6 +7,7 @@ import android.content.pm.PackageManager;
 import android.location.Location;
 import android.os.AsyncTask;
 import android.os.Bundle;
+import android.support.v4.app.FragmentActivity;
 import android.util.Log;
 import android.view.Menu;
 import android.widget.Toast;
@@ -20,7 +20,6 @@ import com.hastagqq.app.api.BasicApiResponse;
 import com.hastagqq.app.api.GetNewsApiResponse;
 import com.hastagqq.app.api.NewsApiClient;
 import com.hastagqq.app.model.DeviceInfo;
-import com.hastagqq.app.model.News;
 import com.hastagqq.app.util.Constants;
 import com.hastagqq.app.util.GPSTracker;
 import com.hastagqq.app.util.GsonUtil;
@@ -34,7 +33,7 @@ import org.apache.http.impl.client.DefaultHttpClient;
 
 import java.io.IOException;
 
-public class MainActivity extends Activity implements NewsApiClient.GetCallback,
+public class MainActivity extends FragmentActivity implements NewsApiClient.GetCallback,
         NewsApiClient.CreateCallback {
 	private static final String TAG = MainActivity.class.getSimpleName();
     private static final String PROPERTY_APP_VERSION = "appVersion";
@@ -72,11 +71,18 @@ public class MainActivity extends Activity implements NewsApiClient.GetCallback,
         mLocation = gpsTracker.getCity();
         Location location = gpsTracker.getLocation();
 
-        Log.d(TAG, "::onCreate() -- " + location.getLatitude() + " - " + location.getLongitude());
+        Log.d(TAG, "::onCreate() -- " + location.getLatitude() + " - " + location.getLongitude() + " - " + mLocation);
 
-        NewsApiClient.createNews(new News("This is the new thing", "asdf", "Makati City", "traffic"),
-                this);
-        NewsApiClient.getNews("Makati City", this);
+//        NewsApiClient.createNews(new News("This is the new thing", "asdf", "Makati City", "traffic"),
+//                this);
+//        NewsApiClient.getNews("Makati City", this);
+        CreateNewsFragment createNewsFragment = new CreateNewsFragment();
+        Bundle args = new Bundle();
+
+        args.putString(CreateNewsFragment.EXTRAS_LOCATION, mLocation);
+        createNewsFragment.setArguments(args);
+        getSupportFragmentManager().beginTransaction().replace(R.id.fl_fragment_container,
+                createNewsFragment).commit();
     }
 
     @Override
