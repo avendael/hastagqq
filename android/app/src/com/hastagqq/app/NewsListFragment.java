@@ -65,6 +65,15 @@ public class NewsListFragment extends ListFragment {
 //        getListView().setAdapter(mAdapter);
 //    }
 
+    @Override
+    public void onResume() {
+        super.onResume();
+
+        mAdapter = new NewsArrayAdapter(getActivity(), R.id.txt_location, mNewsItems);
+
+        setListAdapter(mAdapter);
+    }
+
     public void onNewsAvailable(List<News> newsItems) {
         mNewsItems = newsItems;
         mAdapter = new NewsArrayAdapter(getActivity(), R.id.txt_location, newsItems);

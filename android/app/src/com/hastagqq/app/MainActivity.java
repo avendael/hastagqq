@@ -53,6 +53,7 @@ public class MainActivity extends FragmentActivity implements NewsApiClient.GetC
     private Context mContext;
     private NewsListFragment mNewsListFragment;
     private NewsDal mNewsDal;
+    private List<News> mNewsItems;
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
@@ -130,6 +131,7 @@ public class MainActivity extends FragmentActivity implements NewsApiClient.GetC
         final List<News> newsItems = apiResponse.getNewsItems();
         Log.d(TAG, "::onGetNewsComplete() -- newsItems size = " + newsItems.size());
 
+        mNewsItems = newsItems;
         mNewsListFragment.onNewsAvailable(newsItems);
 
         new Thread(new Runnable() {
@@ -205,6 +207,14 @@ public class MainActivity extends FragmentActivity implements NewsApiClient.GetC
         return getSharedPreferences(MainActivity.class.getSimpleName(), Context.MODE_PRIVATE);
     }
 
+    @Override
+    public void onBackPressed() {
+        super.onBackPressed();
+        if (mNewsListFragment != null && mNewsListFragment.isVisible()) {
+            mNewsListFragment.onNewsAvailable(mNewsItems);
+        }
+    }
+
     private void registerInBackground() {
         new AsyncTask<Void, Void, String>() {
             @Override
@@ -274,6 +284,7 @@ public class MainActivity extends FragmentActivity implements NewsApiClient.GetC
         Bundle args = new Bundle();
 
         args.putString(CreateNewsFragment.EXTRAS_LOCATION, mLocation);
+        Log.d(TAG, "::showCreateNewsFragment() mLocation " + mLocation);
         createNewsFragment.setArguments(args);
         FragmentTransaction transaction = getSupportFragmentManager().beginTransaction();
 

@@ -48,10 +48,7 @@ public class CreateNewsFragment extends Fragment {
         mEtContent = (EditText) view.findViewById(R.id.et_news_content);
         TextView txtLocation = (TextView) view.findViewById(R.id.txt_location);
         String defaultLocation = getString(R.string.default_news_location);
-        mLocation = args != null
-                ? !StringUtils.isNotEmpty(args.getString(EXTRAS_LOCATION, defaultLocation))
-                ? args.getString(EXTRAS_LOCATION, defaultLocation)
-                : defaultLocation : defaultLocation;
+        mLocation = args != null ? args.getString(EXTRAS_LOCATION, defaultLocation) : defaultLocation;
         mCallback = (NewsApiClient.CreateCallback) getActivity();
 
         Log.d(TAG, "::onCreateView() mLocation " + mLocation);
