@@ -1,6 +1,14 @@
 package com.hastagqq.app;
 
-import android.app.Activity;
+import java.io.IOException;
+import java.util.List;
+
+import org.apache.http.HttpResponse;
+import org.apache.http.client.HttpClient;
+import org.apache.http.client.methods.HttpPost;
+import org.apache.http.entity.StringEntity;
+import org.apache.http.impl.client.DefaultHttpClient;
+import org.json.JSONObject;
 import android.content.Context;
 import android.content.SharedPreferences;
 import android.content.pm.PackageInfo;
@@ -8,6 +16,7 @@ import android.content.pm.PackageManager;
 import android.location.Location;
 import android.os.AsyncTask;
 import android.os.Bundle;
+import android.support.v4.app.FragmentActivity;
 import android.util.Log;
 import android.view.Menu;
 import android.widget.Toast;
@@ -22,6 +31,7 @@ import com.hastagqq.app.api.NewsApiClient;
 import com.hastagqq.app.model.DeviceInfo;
 import com.hastagqq.app.model.News;
 import com.hastagqq.app.util.Constants;
+import com.hastagqq.app.util.DBAdapter;
 import com.hastagqq.app.util.GPSTracker;
 import com.hastagqq.app.util.GsonUtil;
 import com.hastagqq.app.util.HttpUtil;
@@ -32,9 +42,27 @@ import org.apache.http.client.methods.HttpPost;
 import org.apache.http.entity.StringEntity;
 import org.apache.http.impl.client.DefaultHttpClient;
 
+import android.content.Context;
+import android.content.SharedPreferences;
+import android.content.pm.PackageInfo;
+import android.content.pm.PackageManager;
+import android.database.Cursor;
+import android.location.Location;
+import android.os.AsyncTask;
+import android.os.Bundle;
+import android.app.Activity;
+import android.support.v4.app.Fragment;
+import android.app.ListActivity;
+import android.support.v4.app.FragmentActivity;
+import android.support.v4.app.FragmentTransaction;
+import android.support.v4.widget.SimpleCursorAdapter;
+import android.util.Log;
+import android.view.Menu;
+import android.widget.ListView;
+import android.widget.Toast;
 import java.io.IOException;
 
-public class MainActivity extends Activity implements NewsApiClient.GetCallback,
+public class MainActivity extends FragmentActivity implements NewsApiClient.GetCallback,
         NewsApiClient.CreateCallback {
 	private static final String TAG = MainActivity.class.getSimpleName();
     private static final String PROPERTY_APP_VERSION = "appVersion";
@@ -46,6 +74,9 @@ public class MainActivity extends Activity implements NewsApiClient.GetCallback,
     private String mRegId;
     private String mLocation;
     private GoogleCloudMessaging mGcm;
+    
+    private Fragment mNewsListFragment;
+
     private Context mContext;
 
     @Override
@@ -71,12 +102,31 @@ public class MainActivity extends Activity implements NewsApiClient.GetCallback,
         GPSTracker gpsTracker = new GPSTracker(MainActivity.this);
         mLocation = gpsTracker.getCity();
         Location location = gpsTracker.getLocation();
-
+        
+        if (location != null)
         Log.d(TAG, "::onCreate() -- " + location.getLatitude() + " - " + location.getLongitude());
+        
+        // NewsApiClient.createNews(new News("This is the new thing", "asdf", "ortigas", "traffic"),
+        //         this);
+        NewsApiClient.getNews("ortigas", this);
+                
+        FragmentTransaction ft = getSupportFragmentManager().beginTransaction();
+        mNewsListFragment = new NewsListFragment();
+        ft.replace(R.id.fl_fragment_container, mNewsListFragment, NewsListFragment.TAG_FRAGMENT);
+        ft.commit();
 
-        NewsApiClient.createNews(new News("This is the new thing", "asdf", "Makati City", "traffic"),
-                this);
-        NewsApiClient.getNews("Makati City", this);
+        Log.d(TAG, "::onCreate() -- " + location.getLatitude() + " - " + location.getLongitude() + " - " + mLocation);
+
+//        NewsApiClient.createNews(new News("This is the new thing", "asdf", "Makati City", "traffic"),
+//                this);
+//        NewsApiClient.getNews("Makati City", this);
+        CreateNewsFragment createNewsFragment = new CreateNewsFragment();
+        Bundle args = new Bundle();
+
+        args.putString(CreateNewsFragment.EXTRAS_LOCATION, mLocation);
+        createNewsFragment.setArguments(args);
+        getSupportFragmentManager().beginTransaction().replace(R.id.fl_fragment_container,
+                createNewsFragment).commit();
     }
 
     @Override
@@ -205,7 +255,36 @@ public class MainActivity extends Activity implements NewsApiClient.GetCallback,
     @Override
     public void onGetNewsComplete(GetNewsApiResponse apiResponse) {
         Log.d(TAG, "::onGetNewsComplete() -- START");
-        Log.d(TAG, "::onGetNewsComplete() -- " + apiResponse);
+        
+        /*DBAdapter db = new DBAdapter(MainActivity.this);
+        db.open();
+        for (int i = 0; i < 10; i++) {
+            long id = db.inserContact("test context " + i, "test category " + i, i, "ortigas", "test title " + i);
+            Log.d(TAG, "::onGetNewsComplete() -- id = " + id);
+        }
+        db.close();*/
+        
+        if (apiResponse.getNewsItems() == null) return;
+        
+        List<News> newss = apiResponse.getNewsItems();
+        Log.d(TAG, "::onGetNewsComplete() -- newss size = " + newss.size());
+        if (!newss.isEmpty()) {
+            for (News news : newss) {
+                Log.d(TAG, "::onGetNewsComplete() -- location = " + news.getLocation());
+            }
+        }
+        
+        /*DBAdapter db = new DBAdapter(MainActivity.this);
+        db.open();
+        Cursor c = db.getAllNews();
+        if (c.moveToFirst()) {
+            do {
+                Log.d(TAG, "::onGetNewsComplete() -- id = " + c.getString(c.getColumnIndex(DBAdapter.KEY_ROWID)) + ", location = " + c.getString(c.getColumnIndex(DBAdapter.KEY_LOCATION)) 
+                        + ", content = " + c.getString(c.getColumnIndex(DBAdapter.KEY_CONTENT)));
+            } while (c.moveToNext());
+        }*/
+        
+        
         Log.d(TAG, "::onGetNewsComplete() -- END");
     }
 

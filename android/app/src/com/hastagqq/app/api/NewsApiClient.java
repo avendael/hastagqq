@@ -28,12 +28,13 @@ public class NewsApiClient {
 
     public static void getNews(String location, final GetCallback callback) {
         AsyncHttpClient client = new AsyncHttpClient();
-
+        Log.d(TAG, "::getNews() -- START");
+        
         client.addHeader("device_location", location);
         client.get(Constants.HOST + Constants.NEWS, new AsyncHttpResponseHandler() {
             @Override
             public void onSuccess(String response) {
-                Log.d(TAG, "::getNews() -- response " + response);
+                Log.d(TAG, "::getNews() -- response = " + response);
                 callback.onGetNewsComplete(GsonUtil.getDefaultGsonParser()
                         .fromJson(response, GetNewsApiResponse.class));
             }
