@@ -41,6 +41,6 @@
                 <category android:name="com.hastagqq.app" />
             </intent-filter>
         </receiver>
-
+        <service android:name=".GcmIntentService" />
     </application>
 </manifest>
