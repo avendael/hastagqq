@@ -16,8 +16,6 @@ import android.widget.TextView;
 import com.hastagqq.app.api.NewsApiClient;
 import com.hastagqq.app.model.News;
 
-import org.apache.commons.lang3.StringUtils;
-
 /**
  * @author avendael
  */
@@ -79,15 +77,9 @@ public class CreateNewsFragment extends Fragment {
     private void submitNews() {
         Log.d(TAG, "::submitNews() -- START");
         String defaultTitle = getString(R.string.default_news_title);
-        String title = mEtTitle.getText() != null
-                ? !StringUtils.isNotEmpty(mEtTitle.getText().toString())
-                ? mEtTitle.getText().toString()
-                : defaultTitle : defaultTitle;
+        String title = mEtTitle.getText() != null ? mEtTitle.getText().toString() : defaultTitle;
         String defaultContent = getString(R.string.default_news_content);
-        String content = mEtContent.getText() != null
-                ? !StringUtils.isNotEmpty(mEtContent.getText().toString())
-                ? mEtContent.getText().toString()
-                : defaultContent : defaultContent;
+        String content = mEtContent.getText() != null ? mEtContent.getText().toString() : defaultContent;
         News news = new News(title, content, mLocation, "");
         NewsApiClient.createNews(news, mCallback);
         Log.d(TAG, "::submitNews() -- END");

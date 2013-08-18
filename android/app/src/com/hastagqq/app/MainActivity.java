@@ -76,9 +76,6 @@ public class MainActivity extends FragmentActivity implements NewsApiClient.GetC
             }
         }
 
-        GPSTracker gpsTracker = new GPSTracker(MainActivity.this);
-        mLocation = gpsTracker.getCity();
-
         showNewsListFragment();
         Log.d(TAG, "::onCreate() -- " + mLocation);
     }
@@ -86,6 +83,9 @@ public class MainActivity extends FragmentActivity implements NewsApiClient.GetC
     @Override
     protected void onResume() {
         super.onResume();
+
+        GPSTracker gpsTracker = new GPSTracker(MainActivity.this);
+        mLocation = gpsTracker.getCity();
 
         try {
             mNewsDal.open();

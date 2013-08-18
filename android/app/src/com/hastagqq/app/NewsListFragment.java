@@ -58,13 +58,6 @@ public class NewsListFragment extends ListFragment {
         setListAdapter(mAdapter);
     }
 
-//    @Override
-//    public void onViewCreated(View view, Bundle savedInstanceState) {
-//        super.onViewCreated(view, savedInstanceState);
-//
-//        getListView().setAdapter(mAdapter);
-//    }
-
     @Override
     public void onResume() {
         super.onResume();
@@ -75,9 +68,11 @@ public class NewsListFragment extends ListFragment {
     }
 
     public void onNewsAvailable(List<News> newsItems) {
-        mNewsItems = newsItems;
-        mAdapter = new NewsArrayAdapter(getActivity(), R.id.txt_location, newsItems);
+        if (getActivity() != null) {
+            mNewsItems = newsItems;
+            mAdapter = new NewsArrayAdapter(getActivity(), R.id.txt_location, newsItems);
 
-        setListAdapter(mAdapter);
+            if (isVisible()) setListAdapter(mAdapter);
+        }
     }
 }
