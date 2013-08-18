@@ -9,6 +9,7 @@
     <dimen name="text_medium">24sp</dimen>
     <dimen name="text_large">32sp</dimen>
 
+    <dimen name="padding_xxsmall">10dp</dimen>
     <dimen name="padding_xsmall">16dp</dimen>
     <dimen name="padding_small">24dp</dimen>
 
