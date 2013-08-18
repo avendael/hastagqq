@@ -1,6 +1,7 @@
 package com.hastagqq.app;
 
 import java.io.IOException;
+import java.util.List;
 
 import org.apache.http.HttpResponse;
 import org.apache.http.client.HttpClient;
@@ -17,6 +18,7 @@ import com.hastagqq.app.api.GetNewsApiResponse;
 import com.hastagqq.app.api.NewsApiClient;
 import com.hastagqq.app.model.News;
 import com.hastagqq.app.util.Constants;
+import com.hastagqq.app.util.DBAdapter;
 import com.hastagqq.app.util.GPSTracker;
 
 import com.loopj.android.http.*;
@@ -25,15 +27,22 @@ import android.content.Context;
 import android.content.SharedPreferences;
 import android.content.pm.PackageInfo;
 import android.content.pm.PackageManager;
+import android.database.Cursor;
 import android.location.Location;
 import android.os.AsyncTask;
 import android.os.Bundle;
 import android.app.Activity;
+import android.support.v4.app.Fragment;
+import android.app.ListActivity;
+import android.support.v4.app.FragmentActivity;
+import android.support.v4.app.FragmentTransaction;
+import android.support.v4.widget.SimpleCursorAdapter;
 import android.util.Log;
 import android.view.Menu;
+import android.widget.ListView;
 import android.widget.Toast;
 
-public class MainActivity extends Activity implements NewsApiClient.GetCallback,
+public class MainActivity extends FragmentActivity implements NewsApiClient.GetCallback,
         NewsApiClient.CreateCallback {
 	private static final String TAG = MainActivity.class.getSimpleName();
     private static final String PROPERTY_APP_VERSION = "appVersion";
@@ -45,7 +54,9 @@ public class MainActivity extends Activity implements NewsApiClient.GetCallback,
 
     private String mRegId;
     private GoogleCloudMessaging mGcm;
-
+    
+    private Fragment mNewsListFragment;
+    
     @Override
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
@@ -60,11 +71,18 @@ public class MainActivity extends Activity implements NewsApiClient.GetCallback,
 
         GPSTracker gpsTracker = new GPSTracker(MainActivity.this);
         Location location = gpsTracker.getLocation();
+        
+        if (location != null)
         Log.d(TAG, "::onCreate() -- " + location.getLatitude() + " - " + location.getLongitude());
-
-        NewsApiClient.createNews(new News("This is the new thing", "asdf", "ortigas", "traffic"),
-                this);
+        
+        // NewsApiClient.createNews(new News("This is the new thing", "asdf", "ortigas", "traffic"),
+        //         this);
         NewsApiClient.getNews("ortigas", this);
+                
+        FragmentTransaction ft = getSupportFragmentManager().beginTransaction();
+        mNewsListFragment = new NewsListFragment();
+        ft.replace(R.id.news_list_container, mNewsListFragment, NewsListFragment.TAG_FRAGMENT);
+        ft.commit();
     }
 
     @Override
@@ -193,7 +211,36 @@ public class MainActivity extends Activity implements NewsApiClient.GetCallback,
     @Override
     public void onGetNewsComplete(GetNewsApiResponse apiResponse) {
         Log.d(TAG, "::onGetNewsComplete() -- START");
-        Log.d(TAG, "::onGetNewsComplete() -- " + apiResponse);
+        
+        /*DBAdapter db = new DBAdapter(MainActivity.this);
+        db.open();
+        for (int i = 0; i < 10; i++) {
+            long id = db.inserContact("test context " + i, "test category " + i, i, "ortigas", "test title " + i);
+            Log.d(TAG, "::onGetNewsComplete() -- id = " + id);
+        }
+        db.close();*/
+        
+        if (apiResponse.getNewsItems() == null) return;
+        
+        List<News> newss = apiResponse.getNewsItems();
+        Log.d(TAG, "::onGetNewsComplete() -- newss size = " + newss.size());
+        if (!newss.isEmpty()) {
+            for (News news : newss) {
+                Log.d(TAG, "::onGetNewsComplete() -- location = " + news.getLocation());
+            }
+        }
+        
+        /*DBAdapter db = new DBAdapter(MainActivity.this);
+        db.open();
+        Cursor c = db.getAllNews();
+        if (c.moveToFirst()) {
+            do {
+                Log.d(TAG, "::onGetNewsComplete() -- id = " + c.getString(c.getColumnIndex(DBAdapter.KEY_ROWID)) + ", location = " + c.getString(c.getColumnIndex(DBAdapter.KEY_LOCATION)) 
+                        + ", content = " + c.getString(c.getColumnIndex(DBAdapter.KEY_CONTENT)));
+            } while (c.moveToNext());
+        }*/
+        
+        
         Log.d(TAG, "::onGetNewsComplete() -- END");
     }
 
